@@ -31,11 +31,11 @@ export abstract class DbRepository<Entity> {
 
   public abstract create(data: Entity): Promise<Entity>;
 
-  public abstract find(): Promise<Entity[]>;
+  public abstract find(query?: any): Promise<Entity[]>;
 
-  public abstract findById(id: ObjectId): Promise<Entity>;
+  public abstract findById(id: ObjectId | string): Promise<Entity | null>;
 
-  public abstract update(id: ObjectId, data: Entity): Promise<Entity>;
+  public abstract update(id: ObjectId | string, data: Entity): Promise<Entity>;
 
-  public abstract delete(id: ObjectId): Promise<boolean>;
+  public abstract delete(id: ObjectId | string): Promise<boolean>;
 }

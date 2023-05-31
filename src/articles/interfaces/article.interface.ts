@@ -1,4 +1,5 @@
 import { IUser } from '../../users/interfaces/user.interface';
+import { ObjectId } from 'mongodb';
 
 export interface IComment {
   content: string;
@@ -13,12 +14,13 @@ export interface ILike {
 }
 
 export interface IArticle {
+  _id?: ObjectId;
   title: string;
   content: string;
   bannerImg: string;
-  createdAt: string;
-  updatedAt: string;
-  creator: IUser;
+  createdAt: Date;
+  updatedAt: Date;
+  creator: ObjectId | string;
   comments: IComment[];
   likes: ILike[];
 }
