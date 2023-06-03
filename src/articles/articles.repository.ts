@@ -1,11 +1,14 @@
-import { Filter, ObjectId } from 'mongodb';
+import { Document, Filter, ObjectId } from 'mongodb';
+import { Injectable } from '@nestjs/common';
 
 import { DbRepository } from '../db/db.repository';
 import { IArticle } from './interfaces/article.interface';
 import { ArticlesQueryDto, OrderEnum } from './dtos/articles-query.dto';
+import { UsersRepository } from '../users/users.repository';
 
+@Injectable()
 export class ArticlesRepository extends DbRepository<IArticle> {
-  constructor() {
+  constructor(private usersRepository: UsersRepository) {
     super('articles');
   }
 
@@ -87,10 +90,71 @@ export class ArticlesRepository extends DbRepository<IArticle> {
     const _id = this.getObjectId(id);
     const doc = (await this.collection.findOne({ _id })) as IArticle;
 
+    doc.creator = await this.usersRepository.findById(doc.creator as ObjectId);
+
     return doc || null;
   }
 
-  update(id: ObjectId, data: IArticle): Promise<IArticle> {
-    return Promise.resolve(undefined);
+  async update(
+    id: ObjectId | string,
+    data: Partial<IArticle>,
+  ): Promise<IArticle> {
+    const _id = this.getObjectId(id);
+    const res = await this.collection.updateOne(
+      { _id },
+      {
+        $set: data,
+      },
+    );
+
+    if (res.modifiedCount === 0) {
+      throw new Error('Failed to update article');
+    }
+
+    return this.findById(_id);
+  }
+
+  async pushToArray(
+    id: ObjectId | string,
+    arrayKey: string,
+    document: Document,
+  ) {
+    const _id = this.getObjectId(id);
+    const res = await this.collection.updateOne(
+      { _id },
+      {
+        $push: {
+          [arrayKey]: document,
+        },
+      },
+    );
+
+    if (res.modifiedCount === 0) {
+      throw new Error('Failed to update article');
+    }
+
+    return this.findById(_id);
+  }
+
+  async deleteFromArray(
+    id: ObjectId | string,
+    arrayKey: keyof IArticle,
+    filter: Record<string, any>,
+  ) {
+    const _id = this.getObjectId(id);
+    const res = await this.collection.updateOne(
+      { _id },
+      {
+        $pull: {
+          [arrayKey]: filter,
+        },
+      },
+    );
+
+    if (res.modifiedCount === 0) {
+      throw new Error('Failed to update article');
+    }
+
+    return this.findById(_id);
   }
 }

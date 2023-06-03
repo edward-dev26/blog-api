@@ -18,4 +18,10 @@ export class DbClient {
 
     return DbClient.instance.client.db(dbName);
   }
+
+  static async connectAdmin() {
+    const db = await DbClient.connect('admin');
+
+    return db.admin();
+  }
 }

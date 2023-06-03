@@ -1,16 +1,17 @@
-import { IUser } from '../../users/interfaces/user.interface';
 import { ObjectId } from 'mongodb';
+import { IUser } from '../../users/interfaces/user.interface';
 
 export interface IComment {
+  _id: ObjectId;
   content: string;
-  creator: IUser;
-  createdAt: string;
-  updatedAt: string;
+  creator: string | ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ILike {
-  creator: IUser;
-  createdAt: string;
+  creator: ObjectId | string;
+  createdAt: Date;
 }
 
 export interface IArticle {
@@ -20,7 +21,7 @@ export interface IArticle {
   bannerImg: string;
   createdAt: Date;
   updatedAt: Date;
-  creator: ObjectId | string;
+  creator: ObjectId | string | IUser;
   comments: IComment[];
   likes: ILike[];
 }
